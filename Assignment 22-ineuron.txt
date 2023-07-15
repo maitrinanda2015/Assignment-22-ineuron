@@ -1,0 +1,195 @@
+3.Given a binary tree, print all its root-to-leaf paths without using recursion. For example, consider the following Binary Tree.
+
+Input:
+
+        6
+     /    \
+    3      5
+  /   \     \
+ 2     5     4
+     /   \
+    7     4
+
+Output:
+
+There are 4 leaves, hence 4 root to leaf paths -
+  6->3->2
+  6->3->5->7
+  6->3->5->4
+  6->5>4
+
+ans-:
+import java.util.Stack;
+
+class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+
+class BinaryTreeRootToLeafPaths {
+    public static void printRootToLeafPaths(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(root);
+
+        while (!stack.isEmpty()) {
+            TreeNode curr = stack.pop();
+
+            if (curr.left == null && curr.right == null) {
+                // Print the path from root to current leaf node
+                printPath(stack, curr);
+            }
+
+            if (curr.right != null) {
+                curr.right.val = curr.val * 10 + curr.right.val;
+                stack.push(curr.right);
+            }
+
+            if (curr.left != null) {
+                curr.left.val = curr.val * 10 + curr.left.val;
+                stack.push(curr.left);
+            }
+        }
+    }
+
+    public static void printPath(Stack<TreeNode> stack, TreeNode leaf) {
+        StringBuilder sb = new StringBuilder();
+        for (TreeNode node : stack) {
+            sb.append(node.val).append("->");
+        }
+        sb.append(leaf.val);
+        System.out.println(sb.toString());
+    }
+
+    public static void main(String[] args) {
+        // Create the binary tree
+        TreeNode root = new TreeNode(6);
+        root.left = new TreeNode(3);
+        root.right = new TreeNode(5);
+        root.left.left = new TreeNode(2);
+        root.left.right = new TreeNode(5);
+        root.right.right = new TreeNode(4);
+        root.left.right.left = new TreeNode(7);
+        root.left.right.right = new TreeNode(4);
+
+        // Print all root-to-leaf paths
+        printRootToLeafPaths(root);
+    }
+}
+
+2.Given Preorder, Inorder and Postorder traversals of some tree. Write a program to check if they all are of the same tree.
+
+**Examples:**
+
+Input : 
+
+        Inorder -> 4 2 5 1 3
+        Preorder -> 1 2 4 5 3
+        Postorder -> 4 5 2 3 1
+Output : 
+
+Yes
+Explanation : 
+
+All of the above three traversals are of
+the same tree 
+
+                           1
+                         /   \
+                        2     3
+                      /   \
+                     4     5
+Input : 
+
+        Inorder -> 4 2 5 1 3
+        Preorder -> 1 5 4 2 3
+        Postorder -> 4 1 2 3 5
+Output : 
+
+No
+
+ans-:
+class TreeNode {
+    int val;
+    TreeNode left;
+    TreeNode right;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+
+class SameTreeCheck {
+    public static boolean isSameTree(int[] inorder, int[] preorder, int[] postorder) {
+        if (inorder.length != preorder.length || inorder.length != postorder.length) {
+            return false;
+        }
+
+        int n = inorder.length;
+        return isSameTreeUtil(inorder, 0, n - 1, preorder, 0, n - 1, postorder, 0, n - 1);
+    }
+
+    public static boolean isSameTreeUtil(int[] inorder, int inStart, int inEnd,
+                                         int[] preorder, int preStart, int preEnd,
+                                         int[] postorder, int postStart, int postEnd) {
+        if (inStart > inEnd || preStart > preEnd || postStart > postEnd) {
+            return true;
+        }
+
+        int rootVal = preorder[preStart];
+        int rootIndex = -1;
+
+        // Find the index of the root in the inorder traversal
+        for (int i = inStart; i <= inEnd; i++) {
+            if (inorder[i] == rootVal) {
+                rootIndex = i;
+                break;
+            }
+        }
+
+        if (rootIndex == -1) {
+            return false;
+        }
+
+        int leftSubtreeSize = rootIndex - inStart;
+        int rightSubtreeSize = inEnd - rootIndex;
+
+        boolean leftSubtree = isSameTreeUtil(inorder, inStart, rootIndex - 1,
+                                             preorder, preStart + 1, preStart + leftSubtreeSize,
+                                             postorder, postStart, postStart + leftSubtreeSize - 1);
+
+        boolean rightSubtree = isSameTreeUtil(inorder, rootIndex + 1, inEnd,
+                                              preorder, preEnd - rightSubtreeSize + 1, preEnd,
+                                              postorder, postEnd - rightSubtreeSize, postEnd - 1);
+
+        return leftSubtree && rightSubtree;
+    }
+
+    public static void main(String[] args) {
+        int[] inorder = {4, 2, 5, 1, 3};
+        int[] preorder = {1, 2, 4, 5, 3};
+        int[] postorder = {4, 5, 2, 3, 1};
+
+        boolean isSame = isSameTree(inorder, preorder, postorder);
+        System.out.println(isSame ? "Yes" : "No");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
